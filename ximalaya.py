@@ -5,7 +5,7 @@ import threading
 import multiprocessing
 import time
 # 爬取的连接
-baseurl = 'https://www.ximalaya.com/xiqu/49205494/'
+baseurl = 'https://www.ximalaya.com/album/8049255'
 # 开始页码
 start_page = 1
 # 结束页码（包含结束页码）
@@ -13,11 +13,14 @@ end_page = 1
 # 最大开启线程数，推荐为cpu核数
 max_downloads_number = 8
 # 下载地址
-download_dict = "F://代码//python代码//music//豫剧//"
+download_dict = "F://代码//python代码//music//黄梅戏//"
+# 下载最大数量
+download_max_num = 50
 ########################以下是逻辑代码#################################
 total_num = 0 # 总任务数
 finished_num = multiprocessing.Value("d", 0) # 下载完成数目
 start = time.perf_counter() # 开始计时
+current_download_num = 0
 # 定义进度条
 def progress_bar(finish_tasks_number, tasks_number):
     scale = 100/tasks_number
@@ -56,9 +59,13 @@ def getMp3(name2,url):
 # 获取连接
 list1 = []
 def get_M4a_Url(s):
+    global current_download_num
     soup = BeautifulSoup(s, "html.parser")
-    for link in soup.find_all(attrs={'class':'text Mi_'}):
-        name1=link.a.get('title')
+    for link in soup.find_all(attrs={'class':'text b_t'}):
+        current_download_num += 1
+        if current_download_num>download_max_num:
+          break
+        name1=link.a.span.text
         id1=link.a.get('href').split('/')[-1]
         src='https://www.ximalaya.com/revision/play/v1/audio?id='+str(id1)+'&ptype=1'
         audiodic=getHTML(src)
